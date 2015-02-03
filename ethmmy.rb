@@ -149,19 +149,22 @@ module EthmmyAgent
 				end
 			end
 
-			return [announcement[:title],day,month,year,hour,minute]
+			return [announcement_array[1][:title],day,month,year,hour,minute]
 		end
 
 		def poll_announcements(subscriptions)
 			debug_year 		= $session_year
-			debug_session	= $session_month
+			debug_month		= $session_month
 			debug_day 		= $session_day
 			debug_hour		= $session_hour
 			debug_minute 	= $session_minute
-			debug_message 	= nil
+			debug_message 	= {}
 			while true do
 				subscriptions.each do |s|
+					debug_time = "#{debug_day}/#{debug_month}/#{debug_year} #{debug_hour}:#{debug_minute}"
 					debug_message = check_for_new_announcement_by s
+					formated_message = "||#{debug_time}|| On #{debug_message[1]}/#{debug_message[2]}/#{debug_message[3]} #{debug_message[4]}:#{debug_message[5]} => #{debug_message[0]}"
+					@callbacks[:debug_message].each {|c| c.call *(formated_message)}
 				end
 				$session_year 	= Time.now.year.to_i
 				$session_month 	= Time.now.month.to_i
