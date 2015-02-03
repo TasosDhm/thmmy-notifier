@@ -44,11 +44,11 @@ module EthmmyAgent
 
 		}
 
-		$session_year 	= nil
-		$session_month 	= nil
-		$session_day 	= nil
-		$session_hour 	= nil
-		$session_minute = nil
+		$session_year 	= Time.now.year.to_i
+		$session_month 	= Time.now.month.to_i
+		$session_day 	= Time.now.day.to_i
+		$session_hour 	= Time.now.hour.to_i
+		$session_minute = Time.now.min.to_i
 
 		def ethmmy_sanitize(announcement)
 			

@@ -17,6 +17,12 @@ module EthmmyAgent
 			@base_url = 'https://alexander.ee.auth.gr:8443/eTHMMY/'
 			@callbacks = Hash.new { |h, k| h[k] = [] }
 
+			$session_year 	= Time.now.year.to_i
+			$session_month 	= Time.now.month.to_i
+			$session_day 	= Time.now.day.to_i
+			$session_hour 	= Time.now.hour.to_i
+			$session_minute = Time.now.min.to_i
+
 			#cert_store = OpenSSL::X509::Store.new
 			#cert_store.set_default_paths
 			#cert_store.add_file File.expand_path('./cacert.pem')
@@ -42,8 +48,8 @@ module EthmmyAgent
 				unless login.search('logout.do')
 					raise "Unable to login"
 				end
-			rescue
-				puts e
+			rescue Exception => e
+				puts e.message
 			end
 		end
 
@@ -142,18 +148,27 @@ module EthmmyAgent
 					@callbacks[:new_announcement].each {|c| c.call *(announcement)}
 				end
 			end
+
+			return [announcement[:title],day,month,year,hour,minute]
 		end
 
 		def poll_announcements(subscriptions)
+			debug_year 		= $session_year
+			debug_session	= $session_month
+			debug_day 		= $session_day
+			debug_hour		= $session_hour
+			debug_minute 	= $session_minute
+			debug_message 	= nil
 			while true do
+				subscriptions.each do |s|
+					debug_message = check_for_new_announcement_by s
+				end
 				$session_year 	= Time.now.year.to_i
 				$session_month 	= Time.now.month.to_i
 				$session_day 	= Time.now.day.to_i
 				$session_hour 	= Time.now.hour.to_i
 				$session_minute = Time.now.min.to_i
-				subscriptions.each do |s|
-					check_for_new_announcement_by s
-				end
+				@callbacks[:debug_message].each {|c| c.call *(debug_message)}
 				sleep($ethmmy_poll_interval)
 			end
 		end
@@ -214,6 +229,9 @@ module EthmmyAgent
 
 		define_method "on_new_announcement" do |&block|
 			@callbacks[:new_announcement] << block
+		end
+		define_method "on_debug_message" do |&block|
+			@callbacks[:debug_message] << block
 		end
 	end
 end
