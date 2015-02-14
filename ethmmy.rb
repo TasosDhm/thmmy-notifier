@@ -133,7 +133,9 @@ module EthmmyAgent
 			year = ethmmy_date[$ethmmy_date_format["year"]].to_i
 			time = ethmmy_date[$ethmmy_date_format["time"]]
 			hour = time.split(':')[0].to_i + $greek_meridian_map[ethmmy_date[$ethmmy_date_format["meridian"]]].to_i
-			if hour == 24 then hour = 0	end
+			# meridian shenanigans
+			if hour == 24 then hour = 12 end
+			if hour == 12 then hour = 0 end
 			minute = time.split(':')[1].to_i
 			if (year > $session_year)
 				@callbacks[:new_announcement].each {|c| c.call *([subject,announcement])}
