@@ -1,5 +1,3 @@
-require 'mechanize'
-
 module EthmmyAgent
 	module EthmmyHelpers
 		Announcement = Struct.new(:title, :date, :author, :body)
@@ -65,20 +63,6 @@ module EthmmyAgent
 			structured_ann = Announcement.new(title, date, author, body)
 
 			return [polished_html, structured_ann]
-		end
-	end
-
-	module ThreadTools
-		class DuplicateThread < StandardError; end
-
-		protected
-		def spawn_thread(sym,arg)
-			raise DuplicateThread if threads.has_key? sym
-			threads[sym] = Thread.new {send sym,arg}
-		end
-
-		def threads
-			@threads ||= {}
 		end
 	end
 end

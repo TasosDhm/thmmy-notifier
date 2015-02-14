@@ -1,14 +1,10 @@
-#!/usr/bin/ruby
-
-#require 'mechanize'
 require './helpers.rb'
 
 module EthmmyAgent
 	class Client
 
 		include EthmmyHelpers
-		include ThreadTools
-		
+
 		attr_reader :subscriptions, :username
 
 		def initialize(username, password)
@@ -51,6 +47,7 @@ module EthmmyAgent
 			rescue Exception => e
 				puts e.message
 			end
+			@courses = get_all_courses
 		end
 
 		def logout
@@ -120,13 +117,14 @@ module EthmmyAgent
 					end
 				end
 			rescue Exception => e
-				@callbacks[:new_announcement].each {|c| c.call *(e.message)}
+				@callbacks[:debug_message].each {|c| c.call *(e.message)}
 			end
 			return ethmmy_sanitize announcement.parent unless announcement.nil?
 		end
 
 		def check_for_new_announcement_by(id)
 			announcement_array = get_latest_announcement_by id
+			subject = @courses[id]
 			announcement = announcement_array[0]
 			ethmmy_date = announcement_array[1][:date].split(' ')
 
@@ -138,14 +136,14 @@ module EthmmyAgent
 			if hour == 24 then hour = 0	end
 			minute = time.split(':')[1].to_i
 			if (year > $session_year)
-				@callbacks[:new_announcement].each {|c| c.call *(announcement)}
+				@callbacks[:new_announcement].each {|c| c.call *([subject,announcement])}
 			elsif (year == $session_year) && (month > $session_month)
-				@callbacks[:new_announcement].each {|c| c.call *(announcement)}
+				@callbacks[:new_announcement].each {|c| c.call *([subject,announcement])}
 			elsif (year == $session_year) && (month == $session_month) && day > $session_day
-				@callbacks[:new_announcement].each {|c| c.call *(announcement)}
+				@callbacks[:new_announcement].each {|c| c.call *([subject,announcement])}
 			elsif (year == $session_year) && (month == $session_month) && (day == $session_day)
 				if hour > $session_hour || ((hour == $session_hour) && (minute >= $session_minute))
-					@callbacks[:new_announcement].each {|c| c.call *(announcement)}
+					@callbacks[:new_announcement].each {|c| c.call *([subject,announcement])}
 				end
 			end
 
@@ -215,7 +213,7 @@ module EthmmyAgent
 			#@subscriptions.sort!
 		end
 
-		def unsuscribe_from(id)
+		def unsubscribe_from(id)
 			unsuscribe_slug = 'cms.course.data.do?method=jspunregister&PRMID='
 			@agent.get(@base_url + unsuscribe_slug + id.to_s)
 		end
