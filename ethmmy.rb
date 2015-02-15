@@ -155,13 +155,13 @@ module EthmmyAgent
 		end
 
 		def poll_announcements(subscriptions)
-			debug_year 		= $session_year
-			debug_month		= $session_month
-			debug_day 		= $session_day
-			debug_hour		= $session_hour
-			debug_minute 	= $session_minute
 			debug_message 	= {}
 			while true do
+				debug_year 		= $session_year
+				debug_month		= $session_month
+				debug_day 		= $session_day
+				debug_hour		= $session_hour
+				debug_minute 	= $session_minute
 				subscriptions.each do |s|
 					debug_time = "#{debug_day}/#{debug_month}/#{debug_year} #{debug_hour}:#{debug_minute}"
 					debug_message = check_for_new_announcement_by s
